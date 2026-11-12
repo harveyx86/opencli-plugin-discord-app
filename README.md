@@ -13,8 +13,8 @@ channels, messages, search, members, navigation, threads, sending and deletion.
 This project is not an official OpenCLI or Discord plugin. Original code remains
 credited to the OpenCLI contributors under Apache-2.0.
 
-> **Experimental:** connection and basic listing have been live-tested. Channel
-> reads, search, threads and actual sends/deletes still need live validation.
+> **Experimental:** all nine read commands and sending have passed macOS smoke
+> tests. Deletion has synthetic coverage only and has not been live-tested.
 > See [verification status](#verification-status) before using write commands.
 
 ## Requirements
@@ -140,6 +140,10 @@ retained, with these deliberate corrections:
 - Private conversations are marked `DirectMessage`, not `Text`.
 - Unknown member presence is `Unknown`; an empty member panel raises `EMPTY_RESULT`.
 - Counts and navigation URLs are validated.
+- Search supports Discord’s contenteditable input, channel filter tokens, loading
+  states and localized empty results.
+- Forum cards and `/channels/guild/channel/threads/thread` routes are supported;
+  legacy four-component thread inputs normalize to this route.
 - Sending refuses existing text/attachment drafts and checks for a new matching rendered message.
 - Deletion scopes controls to the target message/menu/dialog and checks removal.
 - Uncertain writes raise an error and are **never retried automatically**. Inspect
@@ -151,8 +155,8 @@ Extraction covers currently rendered DOM, not complete history or pagination.
 Attachments, rich formatting and hidden content are not fully exported. Names
 resolve from visible sidebar items; IDs and URLs are more reliable. `channels`
 on Friends returns private conversations. Show the member panel for `members`.
-The inherited search selectors/wait and four-component thread URL model still
-need validation against current Discord variants and languages.
+Search and forum selectors were updated against the current desktop UI. Other
+Discord versions and languages may still require selector adjustments.
 
 Commands operate on the existing window. Navigation/search may change read/unread
 state. Do not operate Discord or run another command concurrently with a write.
@@ -162,11 +166,16 @@ commands may fail; inspect Discord rather than blindly retrying writes.
 
 ## Verification status
 
-**Experimental.** Live macOS checks on Discord 0.0.421 / OpenCLI 2.0.3 passed for
-connection, server listing, private-conversation classification, invalid arguments,
-unreachable endpoints and empty-panel errors. Actual channel reads/search/thread
-operations and real message sends/deletes remain **unverified**. No real messages
-were sent or deleted during development.
+**Experimental.** On 2026-11-12, macOS smoke tests with Discord 0.0.421 and
+OpenCLI 2.0.3 passed for all nine read commands: connection, servers, channels,
+members, navigation, message reads, search (hit and no-result), forum listing and
+thread reads. Message/thread identities were checked without publishing private
+content. Two explicitly authorized synthetic messages were sent to a dedicated
+test server and retained at the user's request.
+
+**Deletion has not been live-tested.** It is covered by synthetic tests only; no
+real message was deleted. Tests cover selected visible UI states, not all account,
+language or client-version combinations. CI does not access live Discord.
 
 Automated tests use synthetic DOM and mock CDP only. They cover interface parity,
 message extraction, target checks, connection cleanup, send/draft/channel-change

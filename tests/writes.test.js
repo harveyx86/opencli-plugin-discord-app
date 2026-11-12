@@ -21,6 +21,7 @@ function sendFixture({ draft = '', deliver = true, changeChannel = false, attach
     let enterCount = 0;
     let evaluationCount = 0;
     const page = {
+        async insertText(text) { document.execCommand('insertText', false, text); },
         async evaluate(script) {
             if (changeChannel && ++evaluationCount === 2) fixture.window.history.pushState({}, '', '/channels/111/333');
             return fixture.window.eval(script);
@@ -64,6 +65,14 @@ test('send preserves an existing draft and refuses channel drift', async t => {
 test('send never reports success or retries when delivery is unconfirmed', async t => {
     const f = sendFixture({ deliver: false }); t.after(() => f.fixture.window.close());
     await assert.rejects(sendMessage(f.page, { text: 'new' }), /uncertain/);
+    assert.equal(f.enterCount(), 1);
+});
+
+test('send accepts Discord empty file input without treating it as a draft', async t => {
+    const f = sendFixture(); t.after(() => f.fixture.window.close());
+    f.editor.parentElement.insertAdjacentHTML('beforeend', '<div class="uploadInput_example"><input type="file"></div>');
+    const rows = await sendMessage(f.page, { text: 'Synthetic message' });
+    assert.equal(rows[0].Status, 'Success');
     assert.equal(f.enterCount(), 1);
 });
 

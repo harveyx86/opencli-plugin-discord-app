@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.1
+
+- Use native CDP text input for Discord's Slate composer and search field.
+- Do not mistake the empty file-input wrapper for an attachment draft.
+- Handle search channel-filter tokens, delayed results and localized empty states.
+- Read forum cards and normalize current `/threads/` routes.
+- Live smoke-tested all nine read commands and sending; deletion remains synthetic-only.
+- Add regression tests using synthetic DOM; no private Discord data is included.
+
 ## 0.2.0
 
 - Restore all eleven pre-removal `discord-app` command interfaces, including send and delete.
