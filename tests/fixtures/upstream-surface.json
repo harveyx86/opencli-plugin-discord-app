@@ -1,0 +1,222 @@
+{
+  "commit": "24136945847afbfad266c6c46a8cd335377f9112",
+  "commands": [
+    {
+      "name": "channels",
+      "access": "read",
+      "columns": [
+        "Index",
+        "Channel",
+        "Type",
+        "guild_id",
+        "channel_id",
+        "url"
+      ],
+      "args": []
+    },
+    {
+      "name": "delete",
+      "access": "write",
+      "columns": [
+        "status",
+        "message"
+      ],
+      "args": [
+        {
+          "name": "message_id",
+          "type": "string",
+          "required": true,
+          "positional": true
+        }
+      ]
+    },
+    {
+      "name": "goto",
+      "access": "read",
+      "columns": [
+        "Status",
+        "guild_id",
+        "channel_id",
+        "url"
+      ],
+      "args": [
+        {
+          "name": "guild",
+          "required": false
+        },
+        {
+          "name": "channel",
+          "required": false
+        },
+        {
+          "name": "url",
+          "required": false
+        },
+        {
+          "name": "timeout",
+          "required": false,
+          "default": "8"
+        }
+      ]
+    },
+    {
+      "name": "members",
+      "access": "read",
+      "columns": [
+        "Index",
+        "Name",
+        "Status"
+      ],
+      "args": []
+    },
+    {
+      "name": "read",
+      "access": "read",
+      "columns": [
+        "Author",
+        "Time",
+        "Message",
+        "channel_id",
+        "message_id"
+      ],
+      "args": [
+        {
+          "name": "count",
+          "required": false,
+          "default": "20"
+        },
+        {
+          "name": "guild",
+          "required": false
+        },
+        {
+          "name": "channel",
+          "required": false
+        },
+        {
+          "name": "url",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "search",
+      "access": "read",
+      "columns": [
+        "Index",
+        "Author",
+        "Message"
+      ],
+      "args": [
+        {
+          "name": "query",
+          "required": true,
+          "positional": true
+        }
+      ]
+    },
+    {
+      "name": "send",
+      "access": "write",
+      "columns": [
+        "Status"
+      ],
+      "args": [
+        {
+          "name": "text",
+          "required": true,
+          "positional": true
+        }
+      ]
+    },
+    {
+      "name": "servers",
+      "access": "read",
+      "columns": [
+        "Index",
+        "Server",
+        "guild_id",
+        "url"
+      ],
+      "args": []
+    },
+    {
+      "name": "status",
+      "access": "read",
+      "columns": [
+        "Status",
+        "Url",
+        "Title"
+      ],
+      "args": []
+    },
+    {
+      "name": "thread-read",
+      "access": "read",
+      "columns": [
+        "Author",
+        "Time",
+        "Message",
+        "channel_id",
+        "message_id"
+      ],
+      "args": [
+        {
+          "name": "thread",
+          "required": false
+        },
+        {
+          "name": "count",
+          "required": false,
+          "default": "20"
+        },
+        {
+          "name": "guild",
+          "required": false
+        },
+        {
+          "name": "channel",
+          "required": false
+        },
+        {
+          "name": "url",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "threads",
+      "access": "read",
+      "columns": [
+        "Index",
+        "Thread",
+        "Author",
+        "Updated",
+        "Preview",
+        "guild_id",
+        "channel_id",
+        "thread_id",
+        "url"
+      ],
+      "args": [
+        {
+          "name": "limit",
+          "required": false,
+          "default": "30"
+        },
+        {
+          "name": "guild",
+          "required": false
+        },
+        {
+          "name": "channel",
+          "required": false
+        },
+        {
+          "name": "url",
+          "required": false
+        }
+      ]
+    }
+  ]
+}

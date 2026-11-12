@@ -1,0 +1,13 @@
+Discord Desktop plugin for OpenCLI
+
+Command implementations and lib/utils.js adapted from OpenCLI:
+https://github.com/jackwener/OpenCLI
+Upstream commit: 24136945847afbfad266c6c46a8cd335377f9112
+This is the parent of Electron removal commit f3e221f151336394452fc15f13922f82779dc404.
+Adapter sources also match the @jackwener/opencli 1.8.8 npm package.
+Copyright OpenCLI contributors. Licensed under Apache License 2.0.
+
+Changes: standalone OpenCLI 2.x plugin, local CDP transport, validation,
+full message extraction, direct-message classification, guarded write operations,
+synthetic tests and maintenance documentation.
+Not affiliated with Discord or the OpenCLI project.
