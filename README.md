@@ -99,7 +99,7 @@ retained, with these deliberate corrections:
 - Private conversations are marked `DirectMessage`, not `Text`.
 - Unknown member presence is `Unknown`; an empty member panel raises `EMPTY_RESULT`.
 - Counts and navigation URLs are validated.
-- Sending refuses a nonempty draft and checks for a new matching rendered message.
+- Sending refuses existing text/attachment drafts and checks for a new matching rendered message.
 - Deletion scopes controls to the target message/menu/dialog and checks removal.
 - Uncertain writes raise an error and are **never retried automatically**. Inspect
   Discord before retrying; an error after submission does not prove nothing happened.

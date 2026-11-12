@@ -11,6 +11,9 @@ export async function sendMessage(page, args) {
         const editors = [...document.querySelectorAll('[role="textbox"][data-slate-editor="true"], [class*="slateTextArea"][contenteditable="true"]')].filter(el => el.getClientRects().length);
         if (editors.length !== 1 || document.querySelector('[role="dialog"]')) throw new Error('Expected one message composer and no open dialog.');
         const editor = editors[0];
+        const composer = editor.closest('form') || editor.parentElement;
+        if (composer.querySelector('[class*="upload"], [class*="Upload"], [class*="attachment"], [class*="Attachment"]') ||
+            [...composer.querySelectorAll('input[type="file"]')].some(input => input.files?.length)) throw new Error('The composer contains an attachment draft; clear or send it manually first.');
         if ((editor.textContent || '').trim()) throw new Error('The composer contains a draft; clear or send it manually first.');
         const ids = [...document.querySelectorAll('[id^="chat-messages-"]')].map(el => el.id);
         editor.focus();
@@ -20,7 +23,10 @@ export async function sendMessage(page, args) {
     // A changed channel or composer must not receive the Enter key.
     const ready = await page.evaluate(`(() => {
         const editor = document.activeElement;
+        const composer = editor?.closest('form') || editor?.parentElement;
         return location.pathname === ${JSON.stringify(before.path)} && !document.querySelector('[role="dialog"]') &&
+            composer && !composer.querySelector('[class*="upload"], [class*="Upload"], [class*="attachment"], [class*="Attachment"]') &&
+            ![...composer.querySelectorAll('input[type="file"]')].some(input => input.files?.length) &&
             editor?.matches('[role="textbox"][data-slate-editor="true"], [class*="slateTextArea"][contenteditable="true"]') &&
             (editor.textContent || '').replace(/\\r\\n/g, '\\n') === ${JSON.stringify(text.replace(/\r\n/g, '\n'))};
     })()`);

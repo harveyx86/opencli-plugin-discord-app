@@ -10,12 +10,13 @@ function dom(html) {
     return result;
 }
 
-function sendFixture({ draft = '', deliver = true, changeChannel = false } = {}) {
-    const fixture = dom('<div tabindex="0" role="textbox" data-slate-editor="true" contenteditable="true"></div>');
+function sendFixture({ draft = '', deliver = true, changeChannel = false, attachment = false } = {}) {
+    const fixture = dom('<form><div tabindex="0" role="textbox" data-slate-editor="true" contenteditable="true"></div></form>');
     const { document } = fixture.window;
     const editor = document.querySelector('[role="textbox"]');
     editor.getClientRects = () => [{}];
     editor.textContent = draft;
+    if (attachment) editor.parentElement.insertAdjacentHTML('beforeend', '<div class="uploadContainer">Synthetic attachment.pdf</div>');
     document.execCommand = (_, __, text) => { editor.textContent += text; return true; };
     let enterCount = 0;
     let evaluationCount = 0;
@@ -64,6 +65,13 @@ test('send never reports success or retries when delivery is unconfirmed', async
     const f = sendFixture({ deliver: false }); t.after(() => f.fixture.window.close());
     await assert.rejects(sendMessage(f.page, { text: 'new' }), /uncertain/);
     assert.equal(f.enterCount(), 1);
+});
+
+test('send refuses an attachment-only draft without pressing Enter', async t => {
+    const f = sendFixture({ attachment: true }); t.after(() => f.fixture.window.close());
+    await assert.rejects(sendMessage(f.page, { text: 'new' }), /attachment draft/);
+    assert.equal(f.enterCount(), 0);
+    assert.equal(f.editor.textContent, '');
 });
 
 function deleteFixture({ removeMessage = true, withToolbar = true, preexistingDialog = false } = {}) {

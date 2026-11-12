@@ -77,6 +77,7 @@ test('production command path connects, handles errors, and closes the socket', 
     let closed = 0;
     let replyError = false;
     let unexpectedClose = false;
+    let disconnectDuringDelete = false;
     const sent = [];
     class FakeSocket extends EventTarget {
         static OPEN = 1;
@@ -86,7 +87,7 @@ test('production command path connects, handles errors, and closes the socket', 
             const request = JSON.parse(payload);
             sent.push(request);
             queueMicrotask(() => {
-                if (unexpectedClose) return this.close();
+                if (unexpectedClose || (disconnectDuringDelete && request.params.expression?.includes('let submitted'))) return this.close();
                 const value = request.params.expression === 'document.title' ? 'Synthetic Discord' : 'https://discord.com/channels/@me';
                 const result = replyError ? { exceptionDetails: { text: 'Synthetic JS error' } } : { result: { value } };
                 this.dispatchEvent(new MessageEvent('message', { data: JSON.stringify({ id: request.id, result }) }));
@@ -109,6 +110,14 @@ test('production command path connects, handles errors, and closes the socket', 
     unexpectedClose = true;
     await assert.rejects(command.func({}), { code: 'BROWSER_CONNECT' });
     unexpectedClose = false;
+    disconnectDuringDelete = true;
+    await assert.rejects(getRegistry().get('discord-app/delete').func({ message_id: '999' }), error => {
+        assert.equal(error.code, 'COMMAND_EXEC');
+        assert.match(error.message, /uncertain/);
+        assert.match(error.hint, /before retrying/);
+        return true;
+    });
+    disconnectDuringDelete = false;
     const page = await connectDiscord('http://127.0.0.1:9232');
     await assert.rejects(page.goto('https://example.com'), { code: 'ARGUMENT' });
     await page.pressKey('Meta+F');

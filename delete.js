@@ -114,7 +114,12 @@ export const deleteCommand = cli({
         }
         // Wait a moment for the chat to be fully loaded
         await page.wait(0.5);
-        const result = await page.evaluate(buildDeleteScript(messageId));
+        let result;
+        try {
+            result = await page.evaluate(buildDeleteScript(messageId));
+        } catch (error) {
+            throw new CommandExecutionError(`Deletion outcome is uncertain: ${error.message}`, 'Check Discord before retrying; the confirmation may already have been submitted.');
+        }
         if (result.uncertain) throw new CommandExecutionError(result.message, 'Do not automatically retry a deletion with an uncertain outcome.');
         if (result.ok) {
             await page.wait(1);
