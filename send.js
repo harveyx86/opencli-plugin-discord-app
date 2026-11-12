@@ -7,7 +7,7 @@ export async function sendMessage(page, args) {
     if (typeof text !== 'string' || !text.trim()) throw new ArgumentError('Message text must not be empty.');
     const before = await page.evaluate(`(() => {
         const path = location.pathname;
-        if (!/^\\/channels\\/(?:@me|[0-9]+)\\/[0-9]+(?:\\/[0-9]+)?$/.test(path)) throw new Error('Open the intended Discord channel first.');
+        if (!new RegExp('^/channels/(?:@me|[0-9]+)/[0-9]+(?:/(?:threads/)?[0-9]+)?$').test(path)) throw new Error('Open the intended Discord channel first.');
         const editors = [...document.querySelectorAll('[role="textbox"][data-slate-editor="true"], [class*="slateTextArea"][contenteditable="true"]')].filter(el => el.getClientRects().length);
         if (editors.length !== 1 || document.querySelector('[role="dialog"]')) throw new Error('Expected one message composer and no open dialog.');
         const editor = editors[0];
@@ -40,6 +40,7 @@ export async function sendMessage(page, args) {
                 const normalize = value => value.replace(/\\s+/g, ' ').trim();
                 return [...document.querySelectorAll('[id^="chat-messages-"]')].some(el =>
                     /^chat-messages-[0-9]+-[0-9]+$/.test(el.id) && !oldIds.has(el.id) &&
+                    el.id.startsWith(${JSON.stringify('chat-messages-' + before.path.split('/').at(-1) + '-')}) &&
                     normalize(el.querySelector('[id^="message-content-"]')?.textContent || '') === normalize(${JSON.stringify(text)}) &&
                     !/sending|failed/i.test(el.className));
             })()`);

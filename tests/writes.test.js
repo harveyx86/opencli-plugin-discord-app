@@ -31,7 +31,7 @@ function sendFixture({ draft = '', deliver = true, changeChannel = false, attach
             enterCount++;
             if (deliver) {
                 const node = document.createElement('li');
-                node.id = 'chat-messages-222-999';
+                node.id = `chat-messages-${fixture.window.location.pathname.split('/').at(-1)}-999`;
                 const content = document.createElement('div');
                 content.id = 'message-content-999';
                 content.textContent = editor.textContent;
@@ -60,6 +60,15 @@ test('send preserves an existing draft and refuses channel drift', async t => {
     const changed = sendFixture({ changeChannel: true }); t.after(() => changed.fixture.window.close());
     await assert.rejects(sendMessage(changed.page, { text: 'new' }), /changed/);
     assert.equal(changed.enterCount(), 0);
+});
+
+test('send supports the current thread route and verifies the thread message ID', async t => {
+    const f = sendFixture(); t.after(() => f.fixture.window.close());
+    f.fixture.window.history.pushState({}, '', '/channels/111/222/threads/333');
+    const rows = await sendMessage(f.page, { text: 'Synthetic thread message' });
+    assert.equal(rows[0].Status, 'Success');
+    assert.ok(f.fixture.window.document.getElementById('chat-messages-333-999'));
+    assert.equal(f.enterCount(), 1);
 });
 
 test('send never reports success or retries when delivery is unconfirmed', async t => {
