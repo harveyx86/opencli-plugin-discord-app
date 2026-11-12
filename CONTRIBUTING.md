@@ -1,5 +1,7 @@
 # Contributing
 
+[English](CONTRIBUTING.md) | [简体中文](CONTRIBUTING.zh-CN.md)
+
 Use Node 22.4+ and OpenCLI 2.x. Run `npm ci --ignore-scripts`, `npm test`, then
 `opencli adapter check discord-app` after installing this checkout as a local
 plugin. CI runs synthetic tests without Discord credentials.
@@ -21,3 +23,5 @@ message; synthetic CI does not substitute for live compatibility validation.
 Before a release, update package.json, opencli-plugin.json and CHANGELOG.md,
 refresh the lockfile, run tests, check a clean GitHub install, and document which
 commands were actually live-tested. Keep Apache-2.0 attribution in LICENSE/NOTICE.
+
+Keep the English and Simplified Chinese README and contribution guide in sync.

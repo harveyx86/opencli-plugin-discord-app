@@ -1,21 +1,53 @@
 # Discord Desktop plugin for OpenCLI
 
-Restore the `discord-app` adapter removed in OpenCLI 2.0 as an independently
-maintained plugin. Eleven commands cover connection status, servers, channels,
-messages, search, members, navigation, threads, sending and deletion.
+[English](README.md) | [简体中文](README.zh-CN.md)
 
-This is an unofficial community plugin, not affiliated with Discord or OpenCLI.
+An independently maintained continuation of OpenCLI's former built-in
+`discord-app` adapter. **OpenCLI removed Electron desktop automation in 2.0 and
+no longer maintains this adapter in its main repository.** This project extracts
+that adapter into a standalone community plugin so its functionality can continue
+to be maintained and installed separately.
 
-## Install
+It retains all eleven original command interfaces: connection status, servers,
+channels, messages, search, members, navigation, threads, sending and deletion.
+This project is not an official OpenCLI or Discord plugin. Original code remains
+credited to the OpenCLI contributors under Apache-2.0.
 
-Requires **OpenCLI >=2.0.3 <3**, **Node >=22.4** and a logged-in Discord Desktop
-with a local Chrome DevTools Protocol (CDP) port. No browser extension, bot token,
-Discord client patch or additional runtime dependency is required.
+> **Experimental:** connection and basic listing have been live-tested. Channel
+> reads, search, threads and actual sends/deletes still need live validation.
+> See [verification status](#verification-status) before using write commands.
+
+## Requirements
+
+| Dependency | Requirement |
+| --- | --- |
+| Node.js / npm | Node >=22.4; CI tests Node 22 and 24 |
+| Git | Available on `PATH`; used by OpenCLI to clone/update plugins |
+| OpenCLI | >=2.0.3 and <3 |
+| Discord Desktop | Logged in, running with a local CDP port enabled |
+
+Use a supported Node release from [nodejs.org](https://nodejs.org/en/download).
+Check your environment with `node --version`, `npm --version` and `git --version`.
+
+## Quick start
+
+### 1. Install OpenCLI and the plugin
+
+If you already have a compatible OpenCLI installed, skip the first command.
+The version range keeps installation within OpenCLI 2.x.
 
 ```bash
+npm install --global '@jackwener/opencli@^2.0.3'
 opencli plugin install github:harveyx86/opencli-plugin-discord-app
-opencli discord-app status
 ```
+
+**End users do not need to clone this repository, run `npm install` inside it, or
+build anything.** OpenCLI handles plugin installation and links its own registry
+package. The plugin adds no runtime dependencies; `jsdom` and the pinned OpenCLI
+package are development/test dependencies only. No browser extension or bot token
+is required.
+
+### 2. Start Discord with debugging enabled
 
 On macOS, completely quit Discord, then start it with debugging enabled:
 
@@ -36,11 +68,20 @@ do shell script "/usr/bin/open -a Discord --args --remote-debugging-port=9232"
 
 Starting the launcher while Discord is already running does not add startup flags.
 
-The default endpoint is `http://127.0.0.1:9232`. To override it:
+### 3. Verify the connection
+
+The default endpoint is `http://127.0.0.1:9232`; no environment variable is needed:
 
 ```bash
-export OPENCLI_CDP_ENDPOINT="http://127.0.0.1:9232"
 curl --fail http://127.0.0.1:9232/json/version
+opencli discord-app status
+opencli discord-app servers -f table
+```
+
+For a different port, set the endpoint for one invocation (replace `PORT`):
+
+```bash
+OPENCLI_CDP_ENDPOINT="http://127.0.0.1:PORT" opencli discord-app status
 ```
 
 Only local HTTP endpoints and Discord HTTPS page targets are accepted. Keep one
@@ -153,15 +194,29 @@ git clone https://github.com/harveyx86/opencli-plugin-discord-app.git
 cd opencli-plugin-discord-app
 npm ci --ignore-scripts
 npm test
+```
+
+`npm ci` uses the committed lockfile and installs development dependencies. Keep
+`package-lock.json` in version control; never commit `node_modules/`. No build
+step is required.
+
+To run your checkout through the globally installed OpenCLI:
+
+```bash
+# Only if another copy of discord-app is already installed:
+# opencli plugin uninstall discord-app
 opencli plugin install "$PWD"
 opencli adapter check discord-app
+opencli discord-app status
 ```
 
 Local installation creates a link; changes take effect on the next invocation.
-Keep the checkout in place. Plugin installation omits dev dependencies; run
-`npm ci --ignore-scripts` again when returning to test development. Dependencies
-are only development tooling; runtime registration uses the host OpenCLI package.
-No TypeScript/build step or npm publication is required.
+Keep the checkout in place. OpenCLI's installer omits dev dependencies, so run
+`npm ci --ignore-scripts` again before resuming tests. GitHub installations are
+managed copies; use a local checkout/link for ongoing development.
+
+The package is marked `private` to avoid accidental npm publication. Community
+distribution uses OpenCLI's GitHub plugin installer, not `npm install` of this plugin.
 
 Strategy: DOM/UI extraction over local CDP. Authentication stays in the logged-in
 Discord page; the plugin does not extract tokens or replay private HTTP APIs.
@@ -180,6 +235,20 @@ opencli plugin uninstall discord-app
 
 A local development installation follows your checkout; use Git to manage source.
 Uninstalling a local plugin removes its link, not the checkout.
+
+## Troubleshooting
+
+| Symptom | Check |
+| --- | --- |
+| `Unknown command: discord-app` | Run `opencli --version`, `opencli plugin list` and `opencli list discord-app`; OpenCLI 2.x does not bundle this adapter. |
+| Plugin already installed | Update the existing GitHub install, or uninstall it before switching to a local checkout. |
+| Connection refused | Quit Discord completely, launch with the debugging flag, and verify the same port with `curl`. |
+| No Discord page / multiple pages | Keep one Discord window/page on the configured CDP port. |
+| Empty results | Open the relevant server/channel/panel; only rendered content is visible to the plugin. |
+| Uncertain send/delete result | Inspect Discord before retrying. A transport error does not prove the action failed. |
+
+Report reproducible bugs through [GitHub Issues](https://github.com/harveyx86/opencli-plugin-discord-app/issues).
+Include version numbers and a redacted error, never tokens or private messages.
 
 ## License
 

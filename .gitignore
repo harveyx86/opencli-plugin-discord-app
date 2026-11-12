@@ -1,2 +1,23 @@
+# Installed dependencies; commit package-lock.json for reproducible development.
 node_modules/
+
+# Local environment files; sanitized examples may be committed.
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Logs, caches, test output and package archives.
+*.log
+.cache/
+coverage/
+.nyc_output/
+*.tsbuildinfo
+*.tgz
+
+# OS metadata and editor temporary files.
 .DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
